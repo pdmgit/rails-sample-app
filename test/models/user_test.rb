@@ -6,7 +6,7 @@ class UserTest < ActiveSupport::TestCase
   # end
   
   def setup
-  	@user = User.new( name: 'Test User', email: 'testuser@test.com' )
+  	@user = User.new( name: 'Test User', email: 'testuser@test.com' , password: 'password' , password_confirmation: 'password' )
   end
 
   test "should be valid" do
@@ -18,7 +18,7 @@ class UserTest < ActiveSupport::TestCase
   	assert_not @user.valid?
   end
 
-  test "name should be less than 51 characters" do
+  test "name should be 50 or fewer characters" do
   	@user.name = '012345678901234567890123456789012345678901234567890123456789' # 60 characters long
   	assert_not @user.valid?
   end
@@ -28,7 +28,7 @@ class UserTest < ActiveSupport::TestCase
   	assert_not @user.valid?
   end
 
-  test "email should be less than 256 characters" do
+  test "email should be 255 or fewer characters" do
   	@user.email = 'x'*244 + '@example.com' # for a total of 256 characters
   	assert_not @user.valid?
   end
@@ -56,5 +56,15 @@ class UserTest < ActiveSupport::TestCase
     duplicate_user.email = @user.email.upcase
     @user.save # saves @user so that when duplicate_user is tested an entry with idenical email already exists
     assert_not duplicate_user.valid?
+  end
+
+  test "password should be present and non-blank" do
+    @user.password = @user.password_confirmation = " "*6
+    assert_not @user.valid?
+  end
+
+  test "password should have a minimum length" do
+    @user.password = @user.password_confirmation = "x"*5
+    assert_not @user.valid?
   end
 end
